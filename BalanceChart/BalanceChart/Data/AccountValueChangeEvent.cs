@@ -35,12 +35,12 @@ namespace BalanceChart.Data
         /// <summary>
         ///  The value of change or balance depending on the event type
         /// </summary>
-        public double Value { get; set; }
+        public decimal Value { get; set; }
 
         /// <summary>
         ///  The balance
         /// </summary>
-        public double Balance { get; set; }
+        public decimal Balance { get; set; }
 
         /// <summary>
         ///  The description of the change

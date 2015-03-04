@@ -10,6 +10,9 @@ namespace BalanceChart.Data
     {
         #region Enumerations
 
+        /// <summary>
+        ///  The states an account can possibly be in
+        /// </summary>
         public enum States
         {
             Inactive,
@@ -53,7 +56,7 @@ namespace BalanceChart.Data
         public string Description { get; set; }
 
         /// <summary>
-        ///  All the events that happened
+        ///  All the events that happened in temporal order
         /// </summary>
         public List<AccountValueChangeEvent> Events { get; private set; }
 
@@ -65,7 +68,7 @@ namespace BalanceChart.Data
         /// <summary>
         ///  The balance when this account is opened/created
         /// </summary>
-        public double InitialBalance { get; set; }
+        public decimal InitialBalance { get; set; }
 
         /// <summary>
         ///  The current account state
@@ -81,7 +84,7 @@ namespace BalanceChart.Data
         /// </summary>
         /// <param name="time">The time to get the balance at</param>
         /// <returns>The balance</returns>
-        public double GetBalance(DateTime time)
+        public decimal GetBalance(DateTime time)
         {
             var dummyEvent = new AccountValueChangeEvent
             {
@@ -106,6 +109,37 @@ namespace BalanceChart.Data
                 return Events[index].Balance;
             }
             return index > 0 ? Events[index - 1].Balance : 0;
+        }
+
+        public DateTime GetMinTime()
+        {
+            return InitialTime;
+        }
+
+        public DateTime GetMaxTime()
+        {
+            if (Events.Count > 0)
+            {
+                return Events[Events.Count - 1].Time;
+            }
+            return InitialTime;
+        }
+
+        public void GetBalanceRange(out decimal minBalance, out decimal maxBalance)
+        {
+            minBalance = InitialBalance;
+            maxBalance = InitialBalance;
+            foreach (var e in Events)
+            {
+                if (e.Balance < minBalance)
+                {
+                    minBalance = e.Balance;
+                }
+                else if (e.Balance > maxBalance)
+                {
+                    maxBalance = e.Balance;
+                }
+            }
         }
 
         #endregion
