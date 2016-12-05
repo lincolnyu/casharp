@@ -51,27 +51,7 @@ namespace FinancialPlanner.Loans
         public event LoanEventHandler LoanDailyEvent;
         public DeductInterestSignal DeductInterest { get; private set; }
 
-        public void CopyTo(SingleLoan other)
-        {
-            other.InitBalance = InitBalance;
-            other.InitDate = InitDate;
-
-            other.CurrentBalance = CurrentBalance;
-            other.CurrentDate = CurrentDate;
-
-            other.CurrentAnualRate = CurrentAnualRate;
-            other.DeductInterest = DeductInterest;
-            other.LoanDailyEvent = LoanDailyEvent; // TODO is this right?
-        }
-
-        public void Reset()
-        {
-            CurrentBalance = InitBalance;
-            CurrentDate = InitDate;
-            Status = Statuses.Active;
-        }
-
-        public bool IsClosed() => Status == Statuses.Closed;
+        #region ILoan members
 
         public void ReassignStart(DateTime date)
         {
@@ -117,7 +97,7 @@ namespace FinancialPlanner.Loans
                     CurrentBalance += _accumulatedInterest;
                     _accumulatedInterest = 0;
                 }
-                else
+                else if (CurrentBalance > 0) // loan account doesn't accrue interest
                 {
                     _accumulatedInterest += CurrentDayRate * CurrentBalance;
                 }
@@ -127,10 +107,41 @@ namespace FinancialPlanner.Loans
             LoanDailyEvent?.Invoke(this);
         }
 
+        public ILoan Clone()
+        {
+            var clone = new SingleLoan(DeductInterest);
+            CopyTo(clone);
+            return clone;
+        }
+
+        #endregion
+
+        public void CopyTo(SingleLoan other)
+        {
+            other.InitBalance = InitBalance;
+            other.InitDate = InitDate;
+
+            other.CurrentBalance = CurrentBalance;
+            other.CurrentDate = CurrentDate;
+
+            other.CurrentAnualRate = CurrentAnualRate;
+            other.DeductInterest = DeductInterest;
+            other.LoanDailyEvent = LoanDailyEvent; // TODO is this right?
+        }
+
+        public void Reset()
+        {
+            CurrentBalance = InitBalance;
+            CurrentDate = InitDate;
+            Status = Statuses.Active;
+        }
+
+        public bool IsClosed() => Status == Statuses.Closed;
         private void RecalculateDayRate()
         {
             var numDaysInYear = DateHelper.GetNumDaysInYear(CurrentDate);
             CurrentDayRate = RateHelper.AnualRateToDayRate(CurrentAnualRate, numDaysInYear);
         }
+
     }
 }

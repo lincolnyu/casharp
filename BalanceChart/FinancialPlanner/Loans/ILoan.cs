@@ -9,5 +9,7 @@ namespace FinancialPlanner.Loans
         void ReassignStart(DateTime date);
         void SetToDate(DateTime date);
         void RunOneDay(double netIncome);
+
+        ILoan Clone();
     }
 }

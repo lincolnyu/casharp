@@ -40,7 +40,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Loans\CompositeLoan.cs" />
-    <Compile Include="DLFDaily.cs" />
+    <Compile Include="DailyDlf.cs" />
     <Compile Include="Helpers\DateHelper.cs" />
     <Compile Include="Helpers\RateHelper.cs" />
     <Compile Include="Loans\ILoan.cs" />

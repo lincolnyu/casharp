@@ -8,7 +8,7 @@ namespace FinancialPlanner.Loans
     {
         public delegate IList<double> IncomeSplitterDelegate(CompositeLoan self, double income);
 
-        public readonly List<SingleLoan> Loans = new List<SingleLoan>();
+        public readonly List<ILoan> Loans = new List<ILoan>();
 
         public CompositeLoan(IncomeSplitterDelegate splitter)
         {
@@ -18,6 +18,8 @@ namespace FinancialPlanner.Loans
         public IncomeSplitterDelegate IncomeSplitter;
 
         public double CurrentBalance => Loans.Sum(x => x.CurrentBalance);
+
+        #region ILoan members
 
         public void ReassignStart(DateTime date)
         {
@@ -42,6 +44,31 @@ namespace FinancialPlanner.Loans
                 Loans[i].RunOneDay(allot);
             }
         }
+
+        public ILoan Clone()
+        {
+            var clone = new CompositeLoan(IncomeSplitter);
+            CopyTo(clone);
+            return clone;
+        }
+
+        #endregion
+
+        public T At<T>(int index) where T : ILoan
+        {
+            return (T)Loans[index];
+        }
+
+        public void CopyTo(CompositeLoan other)
+        {
+            other.IncomeSplitter = IncomeSplitter;
+            other.Loans.Clear();
+            foreach (var loan in Loans)
+            {
+                other.Loans.Add(loan.Clone());
+            }
+        }
+
         public void Add(SingleLoan loan)
         {
             Loans.Add(loan);
