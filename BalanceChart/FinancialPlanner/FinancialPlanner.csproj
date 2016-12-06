@@ -39,6 +39,7 @@
     <!-- A reference to the entire .NET Framework is automatically included -->
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DailyDlfSolver.cs" />
     <Compile Include="Loans\CompositeLoan.cs" />
     <Compile Include="DailyDlf.cs" />
     <Compile Include="Helpers\DateHelper.cs" />

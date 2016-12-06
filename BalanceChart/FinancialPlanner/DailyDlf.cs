@@ -1,6 +1,7 @@
 ﻿using FinancialPlanner.Helpers;
 using FinancialPlanner.Loans;
 using System;
+using System.Collections.Generic;
 
 namespace FinancialPlanner
 {
@@ -37,54 +38,7 @@ namespace FinancialPlanner
                 Loan.RunOneDay(income);
             }
         }
-
-        public double Solve(DateTime start, DateTime complete)
-            => Solve(start, complete, TimeSpan.FromDays(15));
-
-        public double Solve(DateTime start, DateTime complete, TimeSpan thr, double initIncome = 2000)
-        {
-            var copy = Loan.Clone();
-            var minIncome = 0.0;
-            var maxIncome = double.MaxValue;
-            var income = initIncome;
-            while (true)
-            {
-                var finish = RunToZero(copy, start, income);
-                if (finish + thr < complete)
-                {
-                    maxIncome = income;
-                    income = (income + minIncome) / 2;
-                }
-                else if (finish > complete + thr)
-                {
-                    minIncome = income;
-                    if (maxIncome == double.MaxValue)
-                    {
-                        income *= 2;
-                    }
-                    else
-                    {
-                        income = (income + maxIncome) / 2;
-                    }
-                }
-                else
-                {
-                    return income;
-                }
-            }
-        }
-
-        private static DateTime RunToZero(ILoan loan, DateTime start, double dailyIncome)
-        {
-            var ct = start;
-            loan.SetToDate(start);
-            for (; loan.CurrentBalance > 0; ct = ct.AddDays(1))
-            {
-                loan.RunOneDay(dailyIncome);
-            }
-            return ct;
-        }
-
+        
         public static DailyDlf CreateMonthlyPaySimulator(double anualIncome, double monthlyExpense,
             double variableLoan, double variableRate, double fixedLoan, double fixedRate, int fixedYears, int dayOfPay = 15, int dayOfInterestCharge = 21)
         {
