@@ -19,6 +19,8 @@ namespace FinancialPlanner.Loans
 
         public double CurrentBalance => Loans.Sum(x => x.CurrentBalance);
 
+        public DateTime CurrentDate => Loans.First().CurrentDate;
+
         #region ILoan members
 
         public void ReassignStart(DateTime date)
@@ -45,9 +47,13 @@ namespace FinancialPlanner.Loans
             }
         }
 
-        public ILoan Clone()
+        public ILoan Clone(ILoan buf = null)
         {
-            var clone = new CompositeLoan(IncomeSplitter);
+            var clone = buf as CompositeLoan;
+            if (clone == null || clone == this)
+            {
+                clone = new CompositeLoan(IncomeSplitter);
+            }
             CopyTo(clone);
             return clone;
         }

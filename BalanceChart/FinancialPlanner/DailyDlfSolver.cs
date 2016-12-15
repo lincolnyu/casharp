@@ -16,21 +16,23 @@ namespace FinancialPlanner
             {
                 var next = points[i].Key;
                 var target = points[i].Value;
-                var daily = Solve(loan, ct, next, target);
+                var daily = Solve(loan, ct, next, target, true);
                 var ts = next - ct;
                 yield return new KeyValuePair<TimeSpan, double>(ts, daily);
                 ct = next;
             }
         }
 
-        public double Solve(ILoan loan, DateTime start, DateTime complete, double target = 0)
+        public double Solve(ILoan loan, DateTime start, DateTime complete, double target = 0, bool update = false)
         {
             var minIncome = 0.0;
             var maxIncome = double.MaxValue;
             var income = InitIncome;
+            var l = loan;
             while (true)
             {
-                var finish = RunToTarget(loan, start, target, income);
+                l = loan.Clone(l);
+                var finish = RunToTarget(l, target, income);
                 if (finish + Tol < complete)
                 {
                     maxIncome = income;
@@ -50,16 +52,18 @@ namespace FinancialPlanner
                 }
                 else
                 {
+                    if (update)
+                    {
+                        l.Clone(loan);
+                    }
                     return income;
                 }
             }
         }
 
-        public static DateTime? RunToTarget(ILoan loan, DateTime start, double target, double dailyIncome)
+        public static DateTime? RunToTarget(ILoan loan, double target, double dailyIncome)
         {
-            var ct = start;
-            loan.SetToDate(start);
-
+            var ct = loan.CurrentDate;
             if (target == loan.CurrentBalance) return ct;
 
             double diff;

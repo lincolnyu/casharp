@@ -1,6 +1,8 @@
 ﻿using FinancialPlanner;
+using FinancialPlanner.Helpers;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace FinancialPlannerConsole
 {
@@ -29,7 +31,7 @@ namespace FinancialPlannerConsole
             };
             sim.Loan.ReassignStart(startDate);
             var startBalance = sim.Loan.CurrentBalance;
-            var clone = sim.Loan;
+            var clone = sim.Loan.Clone();
             sim.Simulate(startDate);
 
             var solver = new DailyDlfSolver();
@@ -41,11 +43,13 @@ namespace FinancialPlannerConsole
                 new KeyValuePair<DateTime, double>( startDate.AddYears(1), startBalance * 0.95 ),
                 new KeyValuePair<DateTime, double>( startDate.AddYears(2), startBalance * 0.89 ),
             };
-            var seq = solver.Fit(clone.Clone(), startDate, balseq);
+            var seq = solver.Fit(clone.Clone(), startDate, balseq).ToList();
             foreach (var item in seq)
             {
                 Console.WriteLine($"{item.Key}->{item.Value}");
             }
+            var mean = seq.Select(x => new Tuple<double, double>(x.Key.Days, x.Value)).GetTemporalMean();
+            Console.WriteLine($"Mean net income: {mean}");
         }
     }
 }

@@ -107,9 +107,13 @@ namespace FinancialPlanner.Loans
             LoanDailyEvent?.Invoke(this);
         }
 
-        public ILoan Clone()
+        public ILoan Clone(ILoan buf = null)
         {
-            var clone = new SingleLoan(DeductInterest);
+            var clone = buf as SingleLoan;
+            if (clone == null || clone == this)
+            {
+                clone = new SingleLoan(DeductInterest);
+            }
             CopyTo(clone);
             return clone;
         }
@@ -127,6 +131,8 @@ namespace FinancialPlanner.Loans
             other.CurrentAnualRate = CurrentAnualRate;
             other.DeductInterest = DeductInterest;
             other.LoanDailyEvent = LoanDailyEvent; // TODO is this right?
+
+            other.Status = Status;
         }
 
         public void Reset()
